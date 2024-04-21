@@ -1,4 +1,4 @@
-# ProxyVis_for_release
+# ProxyVis
 
 ## High Level API Usage
 
