@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "proxy_vis"
+authors = [{"name" = "Galina Chirokova", "email" = "Galina.Chirokova@colostate.edu"},
+           {"name" = "Robert DeMaria", "email" = "Robert.DeMaria@colostate.edu"},
+           {"name" = "Alan Brammer", },
+]
+description = "ProxyVis algorithms and composite utilities."
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.7"
+dynamic = ["version", "dependencies", "optional-dependencies"]
+license = {file = "LICENSE"}
+
+[project.urls]
+Homepage = "https://rammb2.cira.colostate.edu/research/goes-r-research/proxyvis/"
+Repository = "https://github.com/galina-cira/ProxyVis.git"
+
+[tool.setuptools.dynamic]
+version = {attr = "proxy_vis.__version__"}
+dependencies = {file = ["requirements.txt"]}
+optional-dependencies = {test = { file = ["requirements-test.txt"] }}
