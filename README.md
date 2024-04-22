@@ -95,6 +95,7 @@ To run the code, you can use the command:
 This will produce a plot of ProxyVis data in the `examples/output/` directory.
 
 ##########################################################################
+
     This code is part of the ProxyVis processing written by:
     Galina.Chirokova@colostate.edu; Robert.DeMaria@colostate.edu,
     Alan Brammer
