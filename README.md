@@ -3,7 +3,7 @@
 ## High Level API Usage
 
 This is a high-level API for generating GeoProxyVis imagery. The GeoProxyVis imagery
-combines a nighttime infrared (IR)-based proxy for Visible (VIS) imagery at nighttime and adjusted VIS imagery at
+combines ProxyVis - a nighttime infrared (IR)-based proxy for Visible (VIS) imagery at nighttime, and adjusted VIS imagery at
 daytime to create combined day-night GeoProxyVis imagery. The algorithm is described in
 
 Chirokova, G., J. A. Knaff, M. J. Brennan, R. T. DeMaria, M. Bozeman, S. N.
