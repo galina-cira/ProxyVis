@@ -21,8 +21,8 @@ behaves differently during daytime and nighttime. The ProxyVis algorithm was
 developed for nighttime and has not been verified or tested in any way for
 daytime values. Thus, the ProxyVis values are undefined during daytime, for
 solar zenith angles < 89.0 deg 
-2) ProxyVis is generated at 2 km, the native resolution for IR channles.
-However, in order to create a combined full disk image without degrading the
+2) ProxyVis is generated at 2 km resolution, the native resolution for IR channels;
+however, in order to create a combined full disk image without degrading the
 resolution of Vis channel, for operational use the 2 km ProxyVis is regrided to
 0.5 km Vis channel resolution.  This software provides full disk combined day/night
 GeoProxyVis imagery at both 0.5 km and 2 km resolution. 
