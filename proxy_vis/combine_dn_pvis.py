@@ -1,7 +1,7 @@
 """
     This is the main module to esimate both daytime Vis and nighttime ProxyVis
-    parts of the GeoProxyVis imagery your code shoud call the soubroutine
-    get_all_vis_pvis
+    parts of the GeoProxyVis imagery. Your code shoud call the
+    get_all_vis_pvis function.
 
     ##########################################################################
     This code is part of the ProxyVis processing written by:
@@ -26,7 +26,7 @@
 """
 
 import datetime as dt
-from typing import Dict
+from typing import Dict, Tuple
 
 import numpy as np
 
@@ -45,7 +45,7 @@ DataDict = Dict[str, Dict[str, np.ndarray]]
 
 Dictionary of data read from a file.  The keys should be channel names and the
 values should be a sub-dictionary of calibrated data.  The keys for the 
-sub-dictionary should be the type of calibration, one of "bt_temp", "radiances".
+sub-dictionary should be the type of calibration: one of "bt_temp", "radiances".
 """
 
 # Available ProxyVis functions
@@ -87,50 +87,49 @@ def get_all_vis_pvis(
     dvis_alg: str,
     use_saved_params: bool,
     output_resolution: str = OUTPUT_RES_BOTH,
-):
-    """
-    Get combined day/time full disk GeoProxyVis imagery
+) -> Tuple[np.ndarray, np.ndarray, float, float]:
+    """Get combined day/night full disk GeoProxyVis imagery.
 
-    inputs:
-        satellite       :   string, satellite ID (goes-16, -goes-17, himawari)
-        channels        :   list; list of input channels
-        ch_letter       :   satellite specific letter for channel
-                                ( "C" for GOES-16/17, "B" for Himawari )
+    Args:
+        satellite (str): Name of the satellite ("goes16", "goes17", "goes18",
+            "himawari8", "himawari9", "meteosat-9", "meteosat-11")
+        time_dt (dt.datetime): Time of the provided data.
+        data_dict (DataDict): Dictionary of IR and VIS data.
+        pvis_data_to_args_map (Dict[str, str]): Dict mapping data_dict entries
+            to pvis function args
+        dvis_data_to_args_map (Dict[str, str]): Dict mapping data_dict entries
+            to daytime vis function args
+        geo_lons_2km (np.ndarray): Longitudes at IR resolution (2km)
+        geo_lats_2km (np.ndarray): Latitudes at IR resolution (2km)
+        geo_lons_05km (np.ndarray): Longitudes at VIS resolution (0.5km)
+        geo_lats_05km (np.ndarray): Latitudes at VIS resolution (0.5km)
+        minutes_interval (int): Length in minutes of the scan of the full disk
+        pvis_alg (str): Desired ProxyVis function name:
+            ("nighttime_pvis_main_two_eq", "nighttime_pvis_main_one_eq",
+            "nighttime_pvis_simple_two_eq", "nighttime_pvis_simple_one_eq")
+        dvis_alg (str): Desired daytime Vis function name, currently only
+            "vis_disp_sza" is supported.
+        use_saved_params (bool): Whether to use saved/dynamic normalization for
+            ProxyVis
+        output_resolution (str, optional): Must be one of "2.0km", "0.5km", or
+            "both". If "2.0km" or "0.5km" are selected then either the returned
+            2km or 0.5km array will be set to None. Defaults to "both".
 
-        time_dt         :   datetime object
-                            time of the HW full disk image. The time *MUST* match
-                                    exactly the timestamp in HW filename.
-        data_dict       :  dictionary: keys - HW channels ('B03', etc),
-                            values - corresponding data arrays. This must be verion
-                                with all bad values masked
-        geo_lons_05km   : numpy array
-                                array of lons for HW naviagtion for 0.5 km version, numpy array
-        geo_lats_05km   :  numpy array
-                               array of lats for HW naviagtion for 0.5 km version, numpy array
-        geo_lons_2km    :   numpy array
-                                array of lons for HW naviagtion for 2 km version, numpy array
-        geo_lats_2km    :   numpy array
-                                array of lats for HW naviagtion for 2 km version, numpy array
-        pvis_alg   :  function to use to calculate proxy_vis
-        dvis_alg   :  function to use to calculate daytime vis
-
-        use_saved_params    : boolean;
-                            : True  : use pre-saved min/max for ProxyVis
-                            : False : estimates min/max for ProxyVis from data at run time
-                                Note: min/max MUST be estimated from the full disk. If processing
-                                is fo a subsection of disk, pre-saved parameters MUST be used to get
-                                correct output
-
-    outputs:
-
-        pvis_combined_05km  :   numpy array
-                                    full disk combined day/night ProxyVis at 0.5 km resolution; numpy array
-        pvismin            :   float
-                                    min values used for proxy_vis
-        pvismax            :   float
-                                    max value used for proxy_vis
-
-
+    Returns:
+        pvis_combined_05km (np.ndarray): Array containing the combined day/night
+            GeoProxyVis image at 0.5km resolution.  If output_resolution was
+            set to "2.0km" then this will be None.
+        pvis_combined_2km (np.ndarray): Array containing the combined day/night
+            GeoProxyVis image at 2km resolution.  If output_resolution was
+            set to "0.5km" then this will be None.
+        pvismin (float): The minimum value used to normalize the ProxyVis data.
+            If use_saved_params was True, then this value was looked up based
+            on the satellite.  Otherwise, this is calculated based on the data
+            in data_dict.
+        pvismax (float): The maximum value used to normalize the ProxyVis data.
+            If use_saved_params was True, then this value was looked up based
+            on the satellite.  Otherwise, this is calculated based on the data
+            in data_dict.
     """
     sanitized_out_res = output_resolution.lower().strip()
     _validate_output_res_keyword(sanitized_out_res)
@@ -207,31 +206,29 @@ def apply_dn_mask(
     time_info_dt: dt.datetime,
     rlats: np.ndarray,
     rlons: np.ndarray,
-):
-    """
-    Apply day/night mask to Vis and Pvis arrays and create combined arrays
-    Also creates adjusted Vis array
+) -> np.ndarray:
+    """Creates combined day/night image by applying a day night/mask.
 
-    inputs:
-        pvis        : full disk nighttime ProxyVis; numpy array
-        vis         : full disk non-adjusted original vis: numpy array
+    Generates an adjusted vis array from the given vis data, generates a day/night
+    mask, and combines the adjusted vis array and the ProxyVis array into a
+    combined GeoProxyVis image.
 
-        NOTE: pvis and vis could be of either 0.5 km or 2 km resolution,
-        however BOTH arrays MUTS have the same resolution
+    The pvis and vis arguments could be of either 0.5 km or 2 km resolution,
+    but BOTH arrays MUST have the same resolution.
 
-        time_info_dt    : datetime object
-                        : time of the MIDDLE of the scan. This is NOT the HW timestamp.
-                            The HW timestamp is at the start of the scan. This is
-                            at the middle of the scan to calculate SZA most relevant for th efull disk.
+    Args:
+        pvis (np.ndarray): Full disk nighttime ProxyVis.
+        vis (np.ndarray): Full disk non-adjusted original vis data.
+        time_info_dt (dt.datetime): Time of the MIDDLE of the scan. This is NOT
+            the HW timestamp. The HW timestamp is at the start of the scan. This
+            is at the middle of the scan to calculate SZA most relevant for the
+            full disk.
 
-        rlats       : numpy arrys of lats matching resolution for pvis and vis
-        rlons       : numpy arrys of lons matching resolution for pvis and vis
+        rlats (np.ndarray): Array of lats matching resolution for pvis and vis
+        rlons (np.ndarray): Array of lons matching resolution for pvis and vis
 
-    outputs:
-
-        pvis_combined   : numpy array
-                        : combinde day/night data with adjusted Vis
-
+    Returns:
+        pvis_combined (np.ndarray): Combined day/night data with adjusted Vis.
     """
     # start with 2 arrays both regridded to eother 0.5 km or 2 km
     # nightime pvis, and daytime vis
@@ -266,33 +263,31 @@ def calculate_pvis(
     data_to_args: Dict[str, str],
     proxy_vis_alg_name: str,
     use_saved_params: bool,
-):
-    """
-    Prepare data to call the subroutine to calculate nighttime part of
-    GeoProxyVis
+) -> Tuple[np.ndarray, float, float]:
+    """Performs desired ProxyVis generation function.
 
+    Args:
+        satellite (str): Name of the satellite ("goes16", "goes17", "goes18",
+            "himawari8", "himawari9", "meteosat-9", "meteosat-11")
+        data (DataDict): Dictionary of IR and VIS data.
+        data_to_args (Dict[str, str]): Dict mapping data_dict entries
+            to pvis function args.
+        proxy_vis_alg_name (str): Desired ProxyVis function name:
+            ("nighttime_pvis_main_two_eq", "nighttime_pvis_main_one_eq",
+            "nighttime_pvis_simple_two_eq", "nighttime_pvis_simple_one_eq")
+        use_saved_params (bool): Whether to use saved/dynamic normalization for
+            ProxyVis
 
-    inputs:
-        satellite       :   string, satellite ID (goes16, goes17, himawari)
-        data:           :   dictionary
-                        :   keys - HW channels ('B03','B07', etc), values - corresponding data arrays
-                                returned is version with allvalues outside thresh_dist set to NaN
-        data_to_args    :   Dictionary mapping the names of bands in the data
-                            dictionary to the calling arguments of the desired
-                            ProxyVis function.  EX: {'B07': 'c07', 'B11': 'c11'}
-        proxy_vis_alg   :   function name to use to calculate proxy_vis, one of
-                            nighttime_pvis_main_two_eq, nighttime_pvis_main_one_eq,
-                            nighttime_pvis_simple_two_eq, nighttime_pvis_simple_one_eq
-        use_saved_params    : boolean;
-                            : True  : use pre-saved min/max for ProxyVis
-                            : False : estimates min/max for ProxyVis from data at run time
-                                Note: min/max MUST be estimated from the full disk. If processing
-                                is fo a subsection of disk, pre-saved parameters MUST be used to get
-                                correct output
-
-
-    outputs:
-        pvis_2km            : full disk nighttime ProxyVis at original 2km resolution; numpy array
+    Returns:
+        pvis_2km (np.ndarray): ProxyVis data at IR (2km) resolution.
+        pvismin (float): The minimum value used to normalize the ProxyVis data.
+            if use_saved_params was True, then this value was looked up based
+            on the satellite.  Otherwise, this is calculated based on the data
+            in data_dict.
+        pvismax (float): The maximum value used to normalize the ProxyVis data.
+            if use_saved_params was True, then this value was looked up based
+            on the satellite.  Otherwise, this is calculated based on the data
+            in data_dict.
     """
     apv = PVIS_FUNC_LOOKUP[proxy_vis_alg_name]
 
@@ -315,44 +310,34 @@ def calculate_vis(
     rlons: np.ndarray,
     rlats: np.ndarray,
     time_info_dt: dt.datetime,
-):
-    """
-    Prepare data to call the subroutine to calculate daytime part of
-    GeoProxyVis
+) -> Tuple[np.ndarray, float, float]:
+    """Performs desired Vis generation function.
 
+    Args:
+        satellite (str): Name of the satellite ("goes16", "goes17", "goes18",
+            "himawari8", "himawari9", "meteosat-9", "meteosat-11")
+        data (DataDict): Dictionary of IR and VIS data.
+        dvis_data_to_args (Dict[str, str]): Dict mapping data entries
+            to Vis function args.
+        dvis_alg_name (str): Currently must be "vis_disp_sza"
+        rlons (np.ndarray): Array of lons matching resolution for Vis data.
+        rlats (np.ndarray): Array of lats matching resolution for Vis data.
+        time_info_dt (dt.datetime): Time of the middle of the scan.
 
-    inputs:
-        satellite       :   string, satellite ID (goes16, goes17, himawari)
-        data:           :   dictionary
-                        :   keys - HW channels ('B03','B07', etc), values - corresponding data arrays
-                                returned is version with allvalues outside thresh_dist set to NaN
-        data_to_args    :   Dictionary mapping the names of bands in the data
-                            dictionary to the calling arguments of the desired
-                            ProxyVis function.  EX: {'B07': 'c07', 'B11': 'c11'}
-        proxy_vis_alg   :   function name to use to calculate proxy_vis, one of
-                            nighttime_pvis_main_two_eq, nighttime_pvis_main_one_eq,
-                            nighttime_pvis_simple_two_eq, nighttime_pvis_simple_one_eq
-        use_saved_params    : boolean;
-                            : True  : use pre-saved min/max for ProxyVis
-                            : False : estimates min/max for ProxyVis from data at run time
-                                Note: min/max MUST be estimated from the full disk. If processing
-                                is fo a subsection of disk, pre-saved parameters MUST be used to get
-                                correct output
-
-
-    outputs:
-        pvis_2km            : full disk nighttime ProxyVis at original 2km resolution; numpy array
+    Returns:
+        vis_05km (np.ndarray): Adjusted Vis data.
+        vismin (float): The minimum value used to normalize the Vis data.
+        vismax (float): The maximum value used to normalize the Vis data.
     """
     apv = VIS_FUNC_LOOKUP[dvis_alg_name]
 
     channel_args = _create_channel_call_args(data, dvis_data_to_args, "radiances")
 
-    # estimate ProxyVis
+    # Generate adjusted Vis data
     vis_05km, vismin, vismax = apv(
         satellite, rlons, rlats, time_info_dt, **channel_args
     )
 
-    # Only main pvis array is returned since other shoud not be needed for real-time processing
     return vis_05km, vismin, vismax
 
 
@@ -369,13 +354,13 @@ def _create_channel_call_args(
     functions. Uses a map to determine what entries in the data dict corespond to
     each channel argument in the desired ProxyVis function.  For example, the Himawari
     AHI data dict contains i"B02", "B07", "B11", "B13", and "B15" entries.  This
-    needs to map to "c02" for Vis, and "c07", "c11", "c13", and "c15" for ProxyVis calling arguments.  The
-    data_to_args map to accomplish this would be: {"B03":"c02} and
-    {"B07":"c07, "B11":"c11", "B13":"c13", "B15":"c15"}, fopr Vis and proxyVis  correspondingly.The returned
-    dictionary's keys are the function argument names and the values are the
-    arrays corresponding to that argument.  The ** calling syntax can be used
-    with the returned dictionary to pass the appropriate arrays to the desired
-    ProxyVis and Vis functions.
+    needs to map to "c02" for Vis, and "c07", "c11", "c13", and "c15" for ProxyVis
+    calling arguments.  The data_to_args map to accomplish this would be:
+    {"B03":"c02} and {"B07":"c07, "B11":"c11", "B13":"c13", "B15":"c15"}, for
+    Vis and proxyVis  correspondingly.The returned dictionary's keys are the
+    function argument names and the values are the arrays corresponding to that
+    argument.  The ** calling syntax can be used with the returned dictionary to
+    pass the appropriate arrays to the desired ProxyVis and Vis functions.
 
     Args:
         data (DataDict): Dictionary containing input GEO channel data.
@@ -384,8 +369,8 @@ def _create_channel_call_args(
         data_type: a string, 'bt_temp' for ProxyVis or 'readiances' for Vis
 
     Returns:
-        Dict[str, np.ndarray]: Dictionary of data to be used as the channel
-            arguments when calling a ProxyVis function.
+        args (Dict[str, np.ndarray]): Dictionary of data to be used as the
+            channel arguments when calling a ProxyVis function.
     """
     args = {arg: data[data_type][chan] for chan, arg in data_to_args.items()}
     return args

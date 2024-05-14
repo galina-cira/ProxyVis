@@ -25,12 +25,16 @@
 """
 
 import datetime as dt
+from typing import Tuple
+
 import numpy as np
+
 from proxy_vis import solar_zenith_angle
 
 # allowed range of values for visible reflectance
-VIS_VALID_MIN  = 0
-VIS_VALID_MAX  = 1.3
+VIS_VALID_MIN = 0
+VIS_VALID_MAX = 1.3
+
 
 def vis_disp_sza(
     satellite: str,
@@ -38,24 +42,26 @@ def vis_disp_sza(
     lats: np.ndarray,
     time_info_dt: dt.datetime,
     c02: np.ndarray,
-):
-    """
-    transform Vis channel red (0.64 nm) to make daytime portion of Pvis
-    the transformation is done by normalizing Vis by solar zenith angle (SZA) to make
-    it visible up to the day/night terminator
-    inputs:
-        vis: array of vis data, numpy array
-        lons: array of lons, numpy array
-        lats: array of lats, numpy array
+) -> Tuple[np.ndarray, float, float]:
+    """Generate adjusted Vis data.
+
+    Transform Vis channel red (0.64 nm) to make daytime portion of Pvis the
+    transformation is done by normalizing Vis by solar zenith angle (SZA) to
+    make it visible up to the day/night terminator.
+
+    Args:
+        vis (np.ndarray): array of vis data
+        lons (np.ndarray): array of lons
+        lats (np.ndarray): array of lats
         time_info_dt: datetime object for the time in the middle of the scan
-            for example, for Himawary full disk that is start time + 5 minutes
+            for example, for Himawari full disk that is start time + 5 minutes
             for 10-min full disk scan
 
-    outputs:
-        vis_display : numpy array
-                    : adjusted full disk Vis to use with ProxyVis as a daytime part
-
-
+    Returns:
+        vis_disp (np.ndarray): Adjusted full disk Vis to use with ProxyVis as
+            the daytime portion
+        vismin (float): The minimum value used to normalize the Vis data.
+        vismax (float): The maximum value used to normalize the Vis data.
     """
 
     # get arrey of solar zenith angle (SZA) values for the full disk and Vis resolution
@@ -64,7 +70,7 @@ def vis_disp_sza(
     # convert to radians
     rsun_zen_pos_rad = np.deg2rad(rsun_zen)
 
-    # ensure visible data are between 0 and 1.3 
+    # ensure visible data are between 0 and 1.3
     too_big = (np.isfinite(c02)) & (c02 > 1.3)
     too_small = (np.isfinite(c02)) & (c02 < 0)
     c02[too_big] = VIS_VALID_MAX

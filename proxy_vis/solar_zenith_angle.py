@@ -34,16 +34,17 @@ def sza_pysolar(
     lons_e: np.ndarray,
     lats_n: np.ndarray,
     tzinfo: dt.timezone = dt.timezone.utc,
-):
-    """
-    calculate solar zenith angle array using pysolar
-    inputs:
-        sza_datatime: datetime object
-        lon_e: longitutes East (numpy array)
-        lat_n: latitides north (numpy array)
-        tzinfo  : datetime time zone info (optional)
-    outputs:
-        sza: array of sza (numpy array)
+) -> np.ndarray:
+    """Calculates solar zenith angle array using pysolar
+
+    Args:
+        sza_datetime (dt.datetime): Time to generate SZA for.
+        lon_e (np.ndarray): longitutes East
+        lat_n (np.ndarray): latitides North
+        tzinfo (dt.timezone): Time zone to use for sza_datetime. Default is UTC.
+
+    Returns:
+        sza (np.ndarray): Solar zenith angle for the given time.
     """
 
     # calculate full disk solar zenith angle array
@@ -52,18 +53,22 @@ def sza_pysolar(
     return sza
 
 
-def sza_to_mask(sza, mask_night=True, sza_thresh=90.0):
-    """
-    make overlapping sza mask with sza = threshold assigned to both day and night
-    inputs:
-        sza: array of solar zenith angles (numpy array)
-        mask_night: True/False - set night to NaN is True
-                               - set day to NaN if False
-        sza_thresh: default threshold to use for SZA
-            Note: many GEO day/night applications require sza_thresh = 89.0
-            to avoid dividing by zero
-    outputs:
-        sza: array of sza with day or night set to NaN
+def sza_to_mask(sza: np.ndarray, mask_night: bool = True, sza_thresh: float = 90.0):
+    """Generates a mask from the given solar zenith angles.
+
+    Makes overlapping sza mask with sza = threshold assigned to both day and
+    night.
+
+    Args:
+        sza (np.ndarray): Array of solar zenith angles.
+        mask_night (bool): Set night to NaN if True, otherwise set day to NaN.
+            Default is True.
+        sza_thresh (float): Threshold to use for SZA. Many GEO day/night
+            applications require sza_thresh = 89.0 to avoid dividing by zero.
+            Default is 90.0.
+
+    Returns:
+        sza (np.ndarray): Array of SZA with day or night set to NaN.
     """
 
     if mask_night:

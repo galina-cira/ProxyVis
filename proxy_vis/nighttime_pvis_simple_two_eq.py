@@ -23,6 +23,8 @@
     ##########################################################################
 """
 
+from typing import Tuple
+
 import numpy as np
 
 from proxy_vis import norm_pvis, saved_pvis_min_max
@@ -38,40 +40,29 @@ PARAMS2 = np.array([-2.99123569e-13, 7.98853747e-01])
 
 
 def calculate_pvis_simple_two_eq(
-    satellite, c07: np.ndarray, use_saved_params: bool = False
-):
-    """
-    Single-channel two-regressions ProxyVis algorithm
+    satellite: str, c07: np.ndarray, use_saved_params: bool = False
+) -> Tuple[np.ndarray, np.ndarray, float, float]:
+    """ProxyVis Single Channel Two Regressions Equation
 
+    Args:
+        satellite (str): Name of the satellite ("goes16", "goes17", "goes18",
+            "himawari8", "himawari9", "meteosat-9", "meteosat-11")
+        c07 (np.ndarray): IR band should be similar to GOES C07 band data.
+        use_saved_params (bool):  Whether to use saved/dynamic normalization for
+            ProxyVis
 
-    inputs:
-        satellite               : string
-                                : satellite to process
-
-        all_inp_bands_data_dict :   dictionary
-                                :   dictionary is used to allow common interface
-                                    for different versions that use different channels
-                                    keys - GOES/HW channels ('band02', etc),
-                                    values - corresponding data arrays
-
-        use_saved_params        : set True to use saved values; set False to estimate min/max from data
-
-
-    outputs:
-
-        proxy_vis               : numpy array
-                                : full disk nighttime ProxyVis at original 2km resolution; numpy array
-
-        tt_for_regr             : numpy array
-                                : intermediate values only used for development
-
-        pvismin                : float
-                                : ProxyVis min estimated from data
-
-        pvismax                : float
-                                : ProxyVis min estimated from data
-
-
+    Returns:
+        proxy_vis (np.ndarray): Full disk nighttime ProxyVis at original 2km
+            resolution.
+        regr_pvis (np.ndarray): Intermediate values only used for development.
+        pvismin (float): The minimum value used to normalize the ProxyVis data.
+            If use_saved_params was True, then this value was looked up based
+            on the satellite.  Otherwise, this is calculated based on the data
+            in data_dict.
+        pvismax (float): The maximum value used to normalize the ProxyVis data.
+            If use_saved_params was True, then this value was looked up based
+            on the satellite.  Otherwise, this is calculated based on the data
+            in data_dict.
     """
 
     saved_pvis_min, saved_pvis_max = saved_pvis_min_max.lookup_range(satellite)
