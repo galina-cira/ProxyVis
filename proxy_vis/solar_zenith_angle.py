@@ -67,10 +67,10 @@ def sza_to_mask(sza, mask_night=True, sza_thresh=90.0):
     """
 
     if mask_night:
-        sza[sza > sza_thresh] = np.NaN
+        sza[sza > sza_thresh] = np.nan
         sza[sza <= sza_thresh] = 1.0
     else:
-        sza[sza <= sza_thresh] = np.NaN
+        sza[sza <= sza_thresh] = np.nan
         sza[sza > sza_thresh] = 1.0
 
     return sza
