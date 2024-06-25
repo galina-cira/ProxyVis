@@ -1,9 +1,9 @@
 """
-    This module provides the saved min and max val;ues for ProxyVis
-    for all satellites described in Chirokova et al. 2023. Originally ProxyVis was
-    normalized using full-disk min and max values. This created various issues with
-    implementing proxyVis in operations. Thus, we estimated typical min and max values 
-    that can be used instead of dynamic normalization values
+    This module provides the saved min and max values for ProxyVis for all
+    satellites described in Chirokova et al. (2023). Originally ProxyVis was
+    normalized using full-disk min and max values. This created various issues
+    with implementing ProxyVis in operations. Thus, we estimated typical min and
+    max values that can be used instead of dynamic normalization values.
 
     ##########################################################################
     This code is part of the ProxyVis processing written by:
@@ -69,7 +69,8 @@ def lookup_range(satellite: str) -> Tuple[float, float]:
             then a KeyError will be raised.
 
     Returns:
-        Tuple[float, float]: Returns the pvis min and max values.
+        saved_pvis_min(float): The looked up min.
+        saved_pvis_max(float): The looked up max.
     """
     sanitized = satellite.lower().strip()
 

@@ -24,6 +24,8 @@
     ##########################################################################
 """
 
+from typing import Tuple
+
 import numpy as np
 
 # See Chirokova et al. 2023 for details
@@ -35,35 +37,31 @@ def normalize_pvis(
     saved_pvis_min: float,
     saved_pvis_max: float,
     use_saved_params: bool = False,
-):
-    """
-    ProxyVis post-processing to make the image more satble across diferent times
-    this normalization is applied to each of the four ProxyVis algorithms
+) -> Tuple[np.ndarray, float, float]:
+    """Normalize ProxyVis data.
 
+    ProxyVis post-processing to make the final GeoProxyVis image more
+    consistent across diferent times this normalization is applied to each of the
+    four ProxyVis algorithms
 
-    inputs:
-        tt_regr_pvis   :   numpy array
-                        :   proxy_vis estimates before normalization
+    Args:
+        tt_regr_pvis (np.ndarray): ProxyVis estimates before normalization
+        saved_pvis_min (float): saved ProxyVis min values to use
+        saved_pvis_max (float): saved ProxyVis max values to use
+        use_saved_params (bool) Use saved ProxyVis params if True, otherwise,
+        calculate ProxyVis min/max. ProxyVis min/max MUST be calculated from
+        the full disk GEO data.
 
-        saved_pvis_min :   float
-                        :   saved proxy_vis min values to use
-
-        saved_pvis_max :   float
-                        :   saved proxy_vis max values to use
-
-        use_saved_params  : boolean
-                          : True: use saved proxy_vis params
-                            False: calculate proxy_vis min/max. This will ONLY work for full disk data
-
-    outputs:
-        proxy_vis       :   numpy array
-                        :   final normalized proxy_vis data
-
-        saved_pvis_min :   float
-                        :   proxy_vis min that was used
-
-        saved_pvis_max :   float
-                        :   proxy_vis max that was used
+    Returns:
+        proxy_vis (np.ndarray): Final normalized ProxyVis data
+        pvismin (float): The minimum value used to normalize the ProxyVis data.
+            If use_saved_params was True, then this value is the same as the
+            passed min.  Otherwise, this is calculated as the min value in
+            tt_regr_pvis.
+        pvismax (float): The maximum value used to normalize the ProxyVis data.
+            If use_saved_params was True, then this value is the same as the
+            passed max.  Otherwise, this is calculated as the max value in
+            tt_regr_pvis.
 
     """
     # remove data that are less than zero

@@ -24,6 +24,7 @@
 """
 
 from typing import Optional
+
 import numpy as np
 import pyresample as pr
 
@@ -42,7 +43,7 @@ def regrid_nn(
     fill_value: Optional[float] = None,
     epsilon: float = 0.5,
     should_fill_mask: bool = True,
-):
+) -> np.ndarray:
     """Regrids data using nearest-neighbor interpolation.
 
     This is a convenience wrapper for pyresample's kdtree nearest neighbor
@@ -73,7 +74,7 @@ def regrid_nn(
             to True.
 
     Returns:
-        (np.ndarray): The data regridded to the destination grid.
+        result (np.ndarray): The data regridded to the destination grid.
     """
     src_area = pr.geometry.SwathDefinition(lons=src_lons, lats=src_lats)
     dst_area = pr.geometry.SwathDefinition(lons=dst_lons, lats=dst_lats)
