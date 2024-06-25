@@ -24,6 +24,8 @@
     ##########################################################################
 """
 
+from typing import Tuple
+
 import numpy as np
 
 from proxy_vis import norm_pvis, saved_pvis_min_max
@@ -47,43 +49,40 @@ def calculate_pvis_main_two_eq(
     c13: np.ndarray,
     c15: np.ndarray,
     use_saved_params: bool = False,
-):
+) -> Tuple[np.ndarray, np.ndarray, float, float]:
+    """ProxyVis Main Operational multi-channel Two-Regressions Algorithm
+
+    This is the main multi-channel two-regressions ProxyVis algorithm used in
+    National Weather Service (NWS) operations
+
+    Args:
+        satellite (str): Name of the satellite ("goes16", "goes17", "goes18",
+            "himawari8", "himawari9", "meteosat-9", "meteosat-11")
+        c07 (np.ndarray): IR channel similar to GOES-16 C07 channel data
+        c11 (np.ndarray): IR channel similar to GOES-16 C11 channel data
+        c13 (np.ndarray): IR channel similar to GOES-16 C13 channel data
+        c15 (np.ndarray): IR channel similar to GOES-16 C15 channel data
+        use_saved_params (bool):  Whether to use static/dynamic normalization
+            for ProxyVis. Dynamic normalization works best when estimated from the full
+            disk GEO data. For sub-sector ProxyVis images it is recommended to use saved
+            normalization parameters.
+
+    Returns:
+        proxy_vis (np.ndarray): Full disk nighttime ProxyVis at the original
+            2km resolution.
+        regr_pvis (np.ndarray): Intermediate values only used for development.
+        pvismin (float): The minimum value used to normalize the ProxyVis data.
+            If use_saved_params was True, then this value was looked up based
+            on the satellite.  Otherwise, this is calculated based on the data
+            in data_dict.
+        pvismax (float): The maximum value used to normalize the ProxyVis data.
+            If use_saved_params was True, then this value was looked up based
+            on the satellite.  Otherwise, this is calculated based on the data
+            in data_dict.
     """
-    This is the main operational multi-channel 2-regressions ProxyVis algorithm
-
-    inputs:
-        satellite               : string
-                                : satellite to process
-
-        all_inp_bands_data_dict :   dictionary
-                                :   dictionary is used to allow common interface
-                                    for different versions that use different channels
-                                    keys - GOES/HW channels ('band02', etc),
-                                    values - corresponding data arrays
-
-        use_saved_params        : set True to use saved values; set False to estimate min/max from data
-
-
-    outputs:
-
-        proxy_vis               : numpy array
-                                : full disk nighttime ProxyVis at original 2km resolution; numpy array
-
-        tt_for_regr             : numpy array
-                                : intermediate values only used for development
-
-        pvismin                : float
-                                : ProxyVis min estimated from data
-
-        pvismax                : float
-                                : ProxyVis min estimated from data
-
-
-    """
-
     saved_pvis_min, saved_pvis_max = saved_pvis_min_max.lookup_range(satellite)
 
-    # calculate ProxyVis from individual bands
+    # calculate ProxyVis from individual channels
 
     # get indices for low clouds
     low_idx = c07 >= float(TR1)
