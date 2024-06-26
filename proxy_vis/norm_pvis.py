@@ -81,8 +81,9 @@ def normalize_pvis(
     regr_pvis_norm = (tt_regr_pvis - pvismin) / (pvismax - pvismin)
 
     # Remove negative and NaN values. This is required to remove the black dots
-    # that could overvise be seen, especially in Himawari and Meteosat second generations imagery
-    # The negative values that are being removed are related to the noise in 3.9 um channel
+    # that could overvise be seen, especially in Himawari and Meteosat Second
+    # Generation (MSG) imagery The negative values that are being removed are
+    # related to the noise in 3.9 um channel
     regr_pvis_norm[less_than_zero_idx] = 0.0
     regr_pvis_norm[np.isnan(regr_pvis_norm)] = pvismax
 

@@ -54,9 +54,11 @@ def vis_disp_sza(
             "himawari8", "himawari9", "meteosat-9", "meteosat-11")
         lons (np.ndarray): array of lons
         lats (np.ndarray): array of lats
-        time_info_dt: datetime object for the time in the middle of the scan
-            for example, for Himawari full disk that is start time + 5 minutes
-            for a 10-min full disk scan
+        time_info_dt (dt.datetime): Time of the MIDDLE of the scan. This is NOT
+            the GEO satellite data timestamp. The GEO timestamp is at the start
+            of the scan. This is the time of the middle of the scan to calculate SZA most
+            relevant for the full disk. For example, for GOES-16/18, and Himawari8/9 
+            10-min full disk scan this is teh timestamp in the filename +5 minutes. 
         c02 (np.ndarray): Visible channel similar to GOES-16 C02 channel data
 
     Returns:
