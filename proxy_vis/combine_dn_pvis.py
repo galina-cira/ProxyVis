@@ -225,7 +225,8 @@ def apply_dn_mask(
         time_info_dt (dt.datetime): Time of the MIDDLE of the scan. This is NOT
             the GEO satellite data timestamp. The GEO timestamp is at the start
             of the scan. This is the time of the middle of the scan to calculate SZA most
-            relevant for the full disk.
+            relevant for the full disk. For example, for GOES-16/18, and Himawari8/9 
+            10-min full disk scan this is teh timestamp in the filename +5 minutes.
         rlats (np.ndarray): Array of lats matching resolution for pvis and vis_disp
         rlons (np.ndarray): Array of lons matching resolution for pvis and vis_disp
 
@@ -326,7 +327,11 @@ def calculate_vis(
         dvis_alg_name (str): Currently must be "vis_disp_sza"
         rlons (np.ndarray): Array of lons matching resolution for Vis data.
         rlats (np.ndarray): Array of lats matching resolution for Vis data.
-        time_info_dt (dt.datetime): Time of the middle of the scan.
+        time_info_dt (dt.datetime): Time of the MIDDLE of the scan. This is NOT
+            the GEO satellite data timestamp. The GEO timestamp is at the start
+            of the scan. This is the time of the middle of the scan to calculate SZA most
+            relevant for the full disk. For example, for GOES-16/18, and Himawari8/9 
+            10-min full disk scan this is teh timestamp in the filename +5 minutes.
 
     Returns:
         vis_05km (np.ndarray): Adjusted Vis data.
@@ -354,17 +359,17 @@ def _create_channel_call_args(
     to call args. This is needed so that data from other geostationary satellites
     can be used with the subroutines that use ABI Vis and IR channels
 
-    Creates a dictionary containing the channel calling args for ProxyVis and Vis
-    functions. Uses a map to determine what entries in the data dict corespond to
-    each channel argument in the user requested ProxyVis function.  For example, the Himawari
-    AHI data dict contains "B02", "B07", "B11", "B13", and "B15" entries.  This
-    needs to map to "c02" for Vis, and "c07", "c11", "c13", and "c15" for
-    ProxyVis calling arguments.  The data_to_args map to accomplish this would be:
-    {"B03":"c02} and {"B07":"c07, "B11":"c11", "B13":"c13", "B15":"c15"}, for Vis
-    and ProxyVis  correspondingly. The returned dictionary's keys are the function
-    argument names and the values are the arrays corresponding to that argument.
-    The ** calling syntax can be used with the returned dictionary to pass the
-    appropriate arrays to the user requested ProxyVis and Vis functions.
+    Creates a dictionary containing the channel calling args for ProxyVis and
+    Vis functions. Uses a map to determine what entries in the data dict corespond
+    to each channel argument in the user requested ProxyVis function.  For example,
+    the Himawari AHI data dict contains "B02", "B07", "B11", "B13", and "B15"
+    entries.  This needs to map to "c02" for Vis, and "c07", "c11", "c13", and
+    "c15" for ProxyVis calling arguments.  The data_to_args map to accomplish this
+    would be: {"B03":"c02} and {"B07":"c07, "B11":"c11", "B13":"c13", "B15":"c15"},
+    for Vis and ProxyVis  correspondingly. The returned dictionary's keys are the
+    function argument names and the values are the arrays corresponding to that
+    argument.  The ** calling syntax can be used with the returned dictionary to
+    pass the appropriate arrays to the user requested ProxyVis and Vis functions.
 
     Args:
         data (DataDict): Dictionary containing input GEO channel data.
