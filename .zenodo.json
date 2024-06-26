@@ -1,0 +1,30 @@
+{
+    "title": "ProxyVis and GeoProxyVis Imagery for Geostationary Satellite Data",
+    "description": "This package provides high-level and low-level APIs for generating GeoProxyVis imagery.",
+    "license": "AGPL-3.0",
+    "upload_type": "software",
+    "access_right": "open",
+    "version": "4.0.0",
+    "creators": [
+        {
+            "name": "Galina Chirokova",
+            "affiliation": "Coperative Institute for Research in the Atmosphere",
+            "orcid": ""
+        },
+        {
+            "name": "Robert DeMaria",
+            "affiliation": "Coperative Institute for Research in the Atmosphere",
+            "orcid": "0009-0001-8383-2958"
+        },  
+        {
+            "name": "Alan Brammer",
+            "affiliation": "Coperative Institute for Research in the Atmosphere",
+            "orcid": ""
+        }               
+    ],
+    "keywords": [
+        "Infrared Spectrum Data",
+        "Visible Spectrum Data",
+        "Satellite Data"
+    ]
+}
