@@ -9,7 +9,7 @@
         {
             "name": "Galina Chirokova",
             "affiliation": "Coperative Institute for Research in the Atmosphere",
-            "orcid": ""
+            "orcid": "0000-0002-1909-9579"
         },
         {
             "name": "Robert DeMaria",
@@ -19,12 +19,13 @@
         {
             "name": "Alan Brammer",
             "affiliation": "Coperative Institute for Research in the Atmosphere",
-            "orcid": ""
+            "orcid": "0000-0002-5837-5054"
         }               
     ],
     "keywords": [
-        "Infrared Spectrum Data",
-        "Visible Spectrum Data",
-        "Satellite Data"
+        "Cloud detection",
+        "Geostationary Satellite Imagery",
+        "Statistical Algorithms",
+        "Tropical Cyclones"
     ]
 }
