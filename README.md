@@ -1,6 +1,6 @@
 # ProxyVis and GeoProxyVis Imagery for Geostationary Satellite Data
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12557547.svg)](https://doi.org/10.5281/zenodo.12557547)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12557264.svg)](https://doi.org/10.5281/zenodo.12557547)
 
 This package provides high-level and low-level APIs for generating GeoProxyVis
 imagery. 
