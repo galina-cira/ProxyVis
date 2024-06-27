@@ -7,17 +7,17 @@
     "creators": [
         {
             "name": "Galina Chirokova",
-            "affiliation": "Coperative Institute for Research in the Atmosphere",
+            "affiliation": "Cooperative Institute for Research in the Atmosphere",
             "orcid": "0000-0002-1909-9579"
         },
         {
             "name": "Robert DeMaria",
-            "affiliation": "Coperative Institute for Research in the Atmosphere",
+            "affiliation": "Cooperative Institute for Research in the Atmosphere",
             "orcid": "0009-0001-8383-2958"
         },  
         {
             "name": "Alan Brammer",
-            "affiliation": "Coperative Institute for Research in the Atmosphere",
+            "affiliation": "Cooperative Institute for Research in the Atmosphere",
             "orcid": "0000-0002-5837-5054"
         }               
     ],
@@ -27,5 +27,5 @@
         "Statistical Algorithms",
         "Tropical Cyclones"
     ],
-    "grants": [{"id":"02z5nhe81"}, {"id":"02z5nhe81"}]
+    "grants": [{"id":"02z5nhe81"}]
 }
