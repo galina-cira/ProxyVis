@@ -1,8 +1,8 @@
 # ProxyVis and GeoProxyVis Imagery for Geostationary Satellite Data
 
 Chirokova, G., DeMaria, R., & Brammer, A. (2024). ProxyVis and GeoProxyVis
-Imagery for Geostationary Satellite Data (v4.0.2). Zenodo.
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12557264.svg)](https://doi.org/10.5281/zenodo.12560629)
+Imagery for Geostationary Satellite Data. Zenodo.
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.12557264.svg)](https://zenodo.org/doi/10.5281/zenodo.12557264)
 
 This package provides high-level and low-level APIs for generating GeoProxyVis
 imagery. https://rammb2.cira.colostate.edu/research/goes-r-research/proxyvis/ 
